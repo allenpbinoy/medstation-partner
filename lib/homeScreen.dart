@@ -1,12 +1,89 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart';
 import 'package:medstation_partner/addProductScreen.dart';
 import 'package:medstation_partner/productScreen.dart';
+import 'package:medstation_partner/widgets/models/productDetails.dart';
 import 'package:medstation_partner/widgets/widgets.dart';
+import 'package:http/http.dart' as http;
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key key}) : super(key: key);
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List<productDetails> plist = [];
+
+  @override
+  void initState() {
+    super.initState();
+    check();
+  }
+
+  getPdata() async {
+    Uri url =
+        Uri.parse("https://projectmedico.herokuapp.com/products/getProducts");
+    Response response = await get(url);
+    print(response.body);
+    var rb = response.body;
+    print(response.body);
+    var list = json.decode(rb) as List;
+    plist = list.map((e) => productDetails.fromJson(e)).toList();
+    print(list);
+    setState(() {
+      plist = plist;
+    });
+  }
+
+  Future<void> check() async {
+    final storage = new FlutterSecureStorage();
+    var number = await storage.read(key: 'username');
+    var numfinal = number?.substring(1);
+
+    print(number);
+    print(numfinal);
+    print("cutfufuggigiigiu");
+    var map = new Map<String, dynamic>();
+    map['username'] = numfinal;
+    // map['password'] = 'password';
+    var token2 =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MmFmNmI4ZjdiMTk5ODhjM2MwZDdkOGIiLCJpYXQiOjE2NTU2NjM1MDMsImV4cCI6MTY4MTU4MzUwM30.XFCZc-w2pZURhLNiozjjEYq0rVuykttxmoZ9TjO32j8";
+
+    final response = await http.get(
+      Uri.parse('https://projectmedico.herokuapp.com/products/getProducts'),
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer $token2',
+      },
+      /* encoding: Encoding.getByName("utf-8"),
+      body: jsonEncode(map),*/
+    );
+
+    print(response.body);
+    var body = response.body;
+    var data = jsonDecode(response.body) as List;
+    print(data);
+
+    var index = 0;
+    var snumber = data[index].toString();
+
+    var rb = response.body;
+    var list = json.decode(rb) as List;
+    plist = list.map((e) => productDetails.fromJson(e)).toList();
+
+    print(list);
+
+    setState(() {
+      plist = plist;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,8 +191,7 @@ class HomeScreen extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) =>
-                                          const AddProuctScreen()),
+                                      builder: (context) => AddProuctScreen()),
                                 );
                               },
                               child: Container(
@@ -174,87 +250,108 @@ class HomeScreen extends StatelessWidget {
                             height: 8,
                             color: Colors.grey[200],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: new GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const ProductScreen()),
-                                );
-                              },
-                              child: Container(
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width /
-                                                3,
-                                            child: Image.network(
-                                                "https://onemg.gumlet.io/image/upload/a_ignore,w_380,h_380,c_fit,q_auto,f_auto/v1600085129/cropped/mu5bahqxfrp28cut6que.jpg")),
-                                        SizedBox(
-                                          width: 10,
+                          Container(
+                              child: ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: plist.length,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                child: Container(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: new GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ProductScreen()),
+                                        );
+                                      },
+                                      child: Container(
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Container(
+                                                    width:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width /
+                                                            3,
+                                                    child: Image.network(
+                                                        plist[index].imgUrl!)),
+                                                SizedBox(
+                                                  width: 10,
+                                                ),
+                                                Container(
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        plist[index]
+                                                            .productname!,
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 18),
+                                                      ),
+                                                      Text(
+                                                        plist[index].qty!,
+                                                        style: TextStyle(
+                                                            color: Colors.grey,
+                                                            fontSize: 12),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Text(
+                                                        plist[index].price!,
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 18,
+                                                            color: Colors
+                                                                .grey[800]),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      SizedBox(
+                                                        height: 5,
+                                                      ),
+                                                      Text(
+                                                        plist[index].status!,
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 18,
+                                                            color:
+                                                                Colors.green),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                            SizedBox(
+                                              height: 5,
+                                            ),
+                                          ],
                                         ),
-                                        Container(
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Dolo 650",
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18),
-                                              ),
-                                              Text(
-                                                "Strip of 15 pcs",
-                                                style: TextStyle(
-                                                    color: Colors.grey,
-                                                    fontSize: 12),
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Text(
-                                                "₹30",
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18,
-                                                    color: Colors.grey[800]),
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              SizedBox(
-                                                height: 5,
-                                              ),
-                                              Text(
-                                                "Available",
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18,
-                                                    color: Colors.green),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      ],
+                                      ),
                                     ),
-                                    SizedBox(
-                                      height: 5,
-                                    ),
-                                  ],
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ),
+                              );
+                            },
+                          )),
                           Container(
                             height: 8,
                             color: Colors.grey[200],

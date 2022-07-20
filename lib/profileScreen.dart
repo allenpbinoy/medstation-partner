@@ -1,9 +1,92 @@
-import 'package:flutter/material.dart';
+import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:medstation_partner/widgets/models/VendorModel.dart';
 import 'widgets/widgets.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({Key key}) : super(key: key);
+class ProfileScreen extends StatefulWidget {
+  const ProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  List<vendorModel> plist = [];
+  String shopname = "shopname";
+  String phonenumber = "+91123456789";
+  String address = "Address here";
+
+  @override
+  void initState() {
+    super.initState();
+    check();
+  }
+
+  Future<void> check() async {
+    final storage = new FlutterSecureStorage();
+    var number = await storage.read(key: 'username');
+    var numfinal = number?.substring(1);
+
+    print(number);
+    print(numfinal);
+    print("cutfufuggigiigiu");
+    var map = new Map<String, dynamic>();
+    map['username'] = numfinal;
+    // map['password'] = 'password';
+    var token2 =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MmFmNmI4ZjdiMTk5ODhjM2MwZDdkOGIiLCJpYXQiOjE2NTU2NjM1MDMsImV4cCI6MTY4MTU4MzUwM30.XFCZc-w2pZURhLNiozjjEYq0rVuykttxmoZ9TjO32j8";
+
+    final response = await http.post(
+      Uri.parse('https://projectmedico.herokuapp.com/vendor/getVendor'),
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer $token2',
+      },
+      encoding: Encoding.getByName("utf-8"),
+      body: jsonEncode(map),
+    );
+
+    print(response.body);
+    var body = response.body;
+    var data = jsonDecode(response.body) as List;
+    print(data);
+    /* var sname = "jj";
+    sname = data['username']*/
+
+    // ignore: unused_local_variable
+    var index = 0;
+    var snumber = data[index].toString();
+
+    /*vendorModel vendormodel = vendorModel.fromJson(data);
+    print(vendormodel.shopName);*/
+
+    // Create storage
+
+    // Write value
+
+    var rb = response.body;
+    var list = json.decode(rb) as List;
+    plist = list.map((e) => vendorModel.fromJson(e)).toList();
+
+    print(list);
+
+    setState(() {
+      plist = plist;
+    });
+
+    var sname = plist[index].shopName;
+    print(sname);
+    var snumber1 = plist[index].phoneNumber;
+    var saddress = plist[index].sAddress;
+    setState(() {
+      shopname = sname!;
+      phonenumber = snumber1!;
+      address = saddress!;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,7 +142,7 @@ class ProfileScreen extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "New Medicals, Kothamangalam",
+                                  shopname,
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontWeight: FontWeight.bold,
@@ -69,7 +152,7 @@ class ProfileScreen extends StatelessWidget {
                                   height: 5,
                                 ),
                                 Text(
-                                  "+919061950370",
+                                  phonenumber,
                                   style: TextStyle(
                                       color: Colors.amber, fontSize: 14),
                                 ),
@@ -103,8 +186,7 @@ class ProfileScreen extends StatelessWidget {
                             SizedBox(
                               height: 10,
                             ),
-                            Text(
-                                "Kochi - Madurai - Dhanushkodi Road, Nellimattam, Ernakulam District, Kothamangalam, Kerala 686693",
+                            Text(address,
                                 style: TextStyle(
                                     fontSize: 12, color: Colors.grey[800])),
                             SizedBox(

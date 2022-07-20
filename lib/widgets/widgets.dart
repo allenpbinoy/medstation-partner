@@ -20,7 +20,7 @@ class AppBar1 extends StatelessWidget with PreferredSizeWidget {
   @override
   final Size preferredSize;
 
-  AppBar1({Key key})
+  AppBar1({Key? key})
       : preferredSize = const Size.fromHeight(56.0),
         super(key: key);
   @override
@@ -47,7 +47,7 @@ class AppBar2 extends StatelessWidget with PreferredSizeWidget {
   @override
   final Size preferredSize;
 
-  AppBar2({Key key})
+  AppBar2({Key? key})
       : preferredSize = const Size.fromHeight(56.0),
         super(key: key);
   @override
@@ -77,7 +77,7 @@ class AppBar3 extends StatelessWidget with PreferredSizeWidget {
   @override
   final Size preferredSize;
 
-  AppBar3({Key key})
+  AppBar3({Key? key})
       : preferredSize = const Size.fromHeight(0.0),
         super(key: key);
   @override
@@ -108,7 +108,7 @@ class AppBar4 extends StatelessWidget with PreferredSizeWidget {
   @override
   final Size preferredSize;
 
-  AppBar4({Key key})
+  AppBar4({Key? key})
       : preferredSize = const Size.fromHeight(56.0),
         super(key: key);
   @override
@@ -133,7 +133,7 @@ class AppBar6 extends StatelessWidget with PreferredSizeWidget {
   @override
   final Size preferredSize;
 
-  AppBar6({Key key})
+  AppBar6({Key? key})
       : preferredSize = const Size.fromHeight(10.0),
         super(key: key);
   @override
@@ -155,7 +155,7 @@ class AppBar7 extends StatelessWidget with PreferredSizeWidget {
   @override
   final Size preferredSize;
 
-  AppBar7({Key key})
+  AppBar7({Key? key})
       : preferredSize = const Size.fromHeight(0.0),
         super(key: key);
   @override
@@ -177,7 +177,7 @@ class AppBar8 extends StatelessWidget with PreferredSizeWidget {
   @override
   final Size preferredSize;
 
-  AppBar8({Key key})
+  AppBar8({Key? key})
       : preferredSize = const Size.fromHeight(56.0),
         super(key: key);
   @override
@@ -202,19 +202,19 @@ class AppBar8 extends StatelessWidget with PreferredSizeWidget {
   }
 }
 
-class AppDropdownInput<T> extends StatelessWidget {
+/*class AppDropdownInput<T> extends StatelessWidget {
   final String hintText;
   final List<T> options;
   final T value;
   final String Function(T) getLabel;
-  final void Function(T) onChanged;
+   final VoidCallback? onChanged;
 
   AppDropdownInput({
     this.hintText = 'Please select an Option',
     this.options = const [],
-    this.getLabel,
-    this.value,
-    this.onChanged,
+    required this.getLabel,
+    required this.value,
+    required this.onChanged,
   });
 
   @override
@@ -234,7 +234,7 @@ class AppDropdownInput<T> extends StatelessWidget {
             child: DropdownButton<T>(
               value: value,
               isDense: true,
-              onChanged: onChanged,
+              onChanged: onChanged(),
               items: options.map((T value) {
                 return DropdownMenuItem<T>(
                   value: value,
@@ -247,7 +247,7 @@ class AppDropdownInput<T> extends StatelessWidget {
       },
     );
   }
-}
+}*/
 
 //BaseUrl
 

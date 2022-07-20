@@ -4,7 +4,7 @@ import 'package:medstation_partner/widgets/widgets.dart';
 import 'customerScreen.dart';
 
 class OrderScreen extends StatelessWidget {
-  const OrderScreen({Key key}) : super(key: key);
+  const OrderScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -150,7 +150,7 @@ class OrderScreen extends StatelessWidget {
                                     style: ButtonStyle(
                                         backgroundColor:
                                             MaterialStateProperty.all<Color>(
-                                                Colors.amber[800])),
+                                                Colors.amber[800]!)),
                                   )
                                 ],
                               ),

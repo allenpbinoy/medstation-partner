@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:medstation_partner/widgets/widgets.dart';
 
 class ProductScreen extends StatelessWidget {
-  const ProductScreen({Key key}) : super(key: key);
+  const ProductScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +129,7 @@ class ProductScreen extends StatelessWidget {
                               color: Colors.orange[700],
                               border: Border.all(
                                 width: 4,
-                                color: Colors.orange[700],
+                                color: Colors.orange[700]!,
                                 style: BorderStyle.solid,
                               ),
                               borderRadius: BorderRadius.circular(10)),
@@ -169,7 +169,7 @@ class ProductScreen extends StatelessWidget {
                               color: Colors.red[700],
                               border: Border.all(
                                 width: 4,
-                                color: Colors.red[700],
+                                color: Colors.red[700]!,
                                 style: BorderStyle.solid,
                               ),
                               borderRadius: BorderRadius.circular(10)),

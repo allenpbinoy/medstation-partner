@@ -3,7 +3,7 @@ import 'package:medstation_partner/productScreen.dart';
 import 'package:medstation_partner/widgets/widgets.dart';
 
 class SearchScreen extends StatelessWidget {
-  const SearchScreen({Key key}) : super(key: key);
+  const SearchScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -104,8 +104,7 @@ class SearchScreen extends StatelessWidget {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                          builder: (context) => const ProductScreen()),
+                      MaterialPageRoute(builder: (context) => ProductScreen()),
                     );
                   },
                   child: Container(

@@ -1,11 +1,58 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:medstation_partner/registerScreen.dart';
 import 'package:medstation_partner/tabScreen.dart';
-
+import 'package:http/http.dart' as http;
 import 'widgets/widgets.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class OtpScreen extends StatelessWidget {
-  const OtpScreen({Key key}) : super(key: key);
+class OtpScreen extends StatefulWidget {
+  const OtpScreen({Key? key}) : super(key: key);
+
+  @override
+  _OtpScreenState createState() => _OtpScreenState();
+}
+
+class _OtpScreenState extends State<OtpScreen> {
+  TextEditingController otpController = new TextEditingController();
+
+  Future<void> send() async {
+    // This will be sent as form data in the post requst
+    String otp = otpController.text;
+    print(otp);
+    print("cutfufuggigiigiu");
+    var map = new Map<String, dynamic>();
+    map['phoneNumber'] = '+919895784449';
+    map['code'] = otp;
+
+    final response = await http.post(
+      Uri.parse('https://projectmedico.herokuapp.com/users/verify'),
+      body: map,
+    );
+
+    print(response.body);
+    var data = jsonDecode(response.body);
+    var token = data["token"];
+    var username = data["username"];
+    // print(token);
+    //print(username);
+
+// Create storage
+    final storage = new FlutterSecureStorage();
+
+// Write value
+    await storage.write(key: 'jwt', value: token);
+    await storage.write(key: 'username', value: username);
+
+    var value = await storage.read(key: 'username');
+
+    print(value);
+    /*  final storage = new FlutterSecureStorage();
+    await storage.write(key: "token", value: "hbgyhgvyhg");
+    String value = await storage.read(key: "token");
+    print(value);*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +105,7 @@ class OtpScreen extends StatelessWidget {
                             Container(
                               height: 50,
                               child: TextField(
+                                controller: otpController,
                                 maxLength: 6,
                                 //     controller: emailController,
                                 keyboardType: TextInputType.number,
@@ -112,6 +160,7 @@ class OtpScreen extends StatelessWidget {
                               height: 45,
                               child: TextButton(
                                 onPressed: () {
+                                  send();
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(

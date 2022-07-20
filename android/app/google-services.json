@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "539203812560",
+    "project_id": "medico-3c887",
+    "storage_bucket": "medico-3c887.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:539203812560:android:88b406bf6e2bfcfb7472d5",
+        "android_client_info": {
+          "package_name": "com.example.medstation_partner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "539203812560-knrjqv4q7762mugrn5f1pm01r4900rus.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_DzEz_4yZ1v3k6l-ZKf6pQH65cJrwp-o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "539203812560-knrjqv4q7762mugrn5f1pm01r4900rus.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

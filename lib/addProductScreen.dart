@@ -1,25 +1,218 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:medstation_partner/tabScreen.dart';
+import 'package:medstation_partner/widgets/models/VendorModel.dart';
 import 'package:medstation_partner/widgets/widgets.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:uuid/uuid.dart';
 
 class AddProuctScreen extends StatefulWidget {
-  const AddProuctScreen({Key key}) : super(key: key);
+  const AddProuctScreen({Key? key}) : super(key: key);
 
   @override
   _AddProuctScreenState createState() => _AddProuctScreenState();
 }
 
 class _AddProuctScreenState extends State<AddProuctScreen> {
+  var imageUrl =
+      "https://firebasestorage.googleapis.com/v0/b/mullonkalhardwares-a8472.appspot.com/o/placeholder%2Fplaceholder-image.png?alt=media&token=e9738ca3-c35e-4343-bf1a-d80790a56f90";
+  bool uploading = false;
+  var imageid = "aa";
+  List<vendorModel> plist = [];
+  String shopname = "shopname";
+  String phonenumber = "+91123456789";
+  String address = "Address here";
+  String location = "location";
+  final storage = new FlutterSecureStorage();
+  TextEditingController pnameController = new TextEditingController();
+  TextEditingController qtyController = new TextEditingController();
+  TextEditingController priceController = new TextEditingController();
+  TextEditingController compController = new TextEditingController();
+  final TextEditingController _controller = new TextEditingController();
   String dropdownvalue = 'nutri';
 
   // List of items in our dropdown menu
   var items = [
-    'nutri',
+    'nutritinolDrinks',
     'Ayurvedha',
     'Homeopathy',
     'SkinCare',
     'Essentials',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    check();
+  }
+
+  Future<void> check() async {
+    final storage = new FlutterSecureStorage();
+    var number = await storage.read(key: 'username');
+    var numfinal = number?.substring(1);
+
+    print(number);
+    print(numfinal);
+    print("cutfufuggigiigiu");
+    var map = new Map<String, dynamic>();
+    map['username'] = numfinal;
+    // map['password'] = 'password';
+    var token2 =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MmFmNmI4ZjdiMTk5ODhjM2MwZDdkOGIiLCJpYXQiOjE2NTU2NjM1MDMsImV4cCI6MTY4MTU4MzUwM30.XFCZc-w2pZURhLNiozjjEYq0rVuykttxmoZ9TjO32j8";
+
+    final response = await http.post(
+      Uri.parse('https://projectmedico.herokuapp.com/vendor/getVendor'),
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer $token2',
+      },
+      encoding: Encoding.getByName("utf-8"),
+      body: jsonEncode(map),
+    );
+
+    print(response.body);
+
+    print(response.body);
+    var body = response.body;
+    var data = jsonDecode(response.body) as List;
+    print(data);
+    /* var sname = "jj";
+    sname = data['username']*/
+
+    // ignore: unused_local_variable
+    var index = 0;
+
+    /*vendorModel vendormodel = vendorModel.fromJson(data);
+    print(vendormodel.shopName);*/
+
+    // Create storage
+
+    // Write value
+
+    var rb = response.body;
+    var list = json.decode(rb) as List;
+    plist = list.map((e) => vendorModel.fromJson(e)).toList();
+
+    print(list);
+
+    setState(() {
+      plist = plist;
+    });
+
+    var sname = plist[index].shopName;
+    print(sname);
+    var snumber1 = plist[index].phoneNumber;
+    var saddress = plist[index].sAddress;
+    var loc = plist[index].sLocation;
+    setState(() {
+      shopname = sname!;
+      phonenumber = snumber1!;
+      address = saddress!;
+      location = loc!;
+    });
+  }
+
+  Future<void> send() async {
+    var number = await storage.read(key: 'username');
+    final shopbody = {"id": number};
+
+    // Response res = await get(Uri.parse());
+    /* var shopname = nameController.text;
+    var sAddress = addrController.text;
+    var wnumber = watController.text;*/
+    var sLocation = await storage.read(key: 'location');
+    // This will be sent as form data in the post requst
+    // String number = "+91" + noController.text;
+    // print(number);
+    //var number = await storage.read(key: 'username');
+    print("cutfufuggigiigiu");
+    var map = new Map<String, dynamic>();
+    map['productname'] = pnameController.text;
+    map['qty'] = qtyController.text;
+    map['price'] = priceController.text;
+    map['category'] = _controller.text;
+    map['composition'] = compController.text;
+    map['username'] = number;
+    map['shopname'] = shopname;
+    map['sAddress'] = address;
+    map['whatsappNumber'] = phonenumber;
+    map['sLocation'] = location;
+    map['imgUrl'] = imageUrl;
+    map['status'] = "enabled";
+
+    // map['password'] = 'password';
+    var token = await storage.read(key: "token");
+    print(jsonEncode(map));
+    var token2 =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MmFmNmI4ZjdiMTk5ODhjM2MwZDdkOGIiLCJpYXQiOjE2NTU2NjM1MDMsImV4cCI6MTY4MTU4MzUwM30.XFCZc-w2pZURhLNiozjjEYq0rVuykttxmoZ9TjO32j8";
+    final response = await http.post(
+      Uri.parse('https://projectmedico.herokuapp.com/products/createProduct'),
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': 'Bearer $token2',
+      },
+      encoding: Encoding.getByName("utf-8"),
+      body: jsonEncode(map),
+    );
+
+    print(response.body);
+
+    var body = response.body;
+
+    if (body != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => TabScreen()),
+      );
+    }
+  }
+
+  uploadImage() async {
+    print(uploading);
+    final _storage = FirebaseStorage.instance;
+    final _picker = ImagePicker();
+    PickedFile? image;
+
+    await Permission.photos.request();
+    var permmissionStatus = await Permission.photos.status;
+
+    if (permmissionStatus.isGranted) {
+      print("permission granted");
+      var uuid = Uuid();
+      //print();
+      var imgId = uuid.v1();
+      // ignore: deprecated_member_use
+      image = (await _picker.getImage(
+          source: ImageSource.gallery, imageQuality: 50));
+      var file = File(image!.path);
+      var snapshot = await _storage.ref().child("$imgId/item").putFile(file);
+
+      var downloadUrl = await snapshot.ref.getDownloadURL();
+      await storage.write(key: 'imageUrl', value: downloadUrl);
+      var value1 = await storage.read(key: 'imageUrl');
+      var value2 = await storage.read(key: 'location');
+      print(value2);
+      print(value1);
+      setState(() {
+        imageUrl = downloadUrl;
+        uploading = true;
+        imageid = imgId;
+        //_uploadSuccess = true;
+        print(imageUrl);
+        print(uploading);
+        print(imageid);
+      });
+    } else {
+      print("permission denied");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -58,6 +251,7 @@ class _AddProuctScreenState extends State<AddProuctScreen> {
                       Container(
                         height: 60,
                         child: TextField(
+                          controller: pnameController,
                           decoration: InputDecoration(
                               fillColor: Colors.white,
                               filled: true,
@@ -79,6 +273,7 @@ class _AddProuctScreenState extends State<AddProuctScreen> {
                       Container(
                         height: 60,
                         child: TextField(
+                          controller: qtyController,
                           decoration: InputDecoration(
                               fillColor: Colors.white,
                               filled: true,
@@ -100,6 +295,7 @@ class _AddProuctScreenState extends State<AddProuctScreen> {
                       Container(
                         height: 60,
                         child: TextField(
+                          controller: priceController,
                           decoration: InputDecoration(
                               fillColor: Colors.white,
                               filled: true,
@@ -121,6 +317,7 @@ class _AddProuctScreenState extends State<AddProuctScreen> {
                       Container(
                         height: 60,
                         child: TextField(
+                          controller: compController,
                           decoration: InputDecoration(
                               fillColor: Colors.white,
                               filled: true,
@@ -142,12 +339,34 @@ class _AddProuctScreenState extends State<AddProuctScreen> {
                       Padding(
                         padding: const EdgeInsets.all(.0),
                         child: Container(
-                          color: Colors.white,
-                          height: 60,
-                          width: MediaQuery.of(context).size.width,
-                          child: Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: DropdownButton(
+                            color: Colors.white,
+                            height: 60,
+                            width: MediaQuery.of(context).size.width,
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                      child:
+                                          TextField(controller: _controller)),
+                                  new PopupMenuButton<String>(
+                                    icon: const Icon(Icons.arrow_drop_down),
+                                    onSelected: (String value) {
+                                      _controller.text = value;
+                                    },
+                                    itemBuilder: (BuildContext context) {
+                                      return items.map<PopupMenuItem<String>>(
+                                          (String value) {
+                                        return new PopupMenuItem(
+                                            child: new Text(value),
+                                            value: value);
+                                      }).toList();
+                                    },
+                                  ),
+                                ],
+                              ),
+
+                              /* DropdownButton(
                               // Initial Value
                               value: dropdownvalue,
 
@@ -168,45 +387,54 @@ class _AddProuctScreenState extends State<AddProuctScreen> {
                                   dropdownvalue = newValue;
                                 });
                               },
-                            ),
-                          ),
-                        ),
+                            )*/
+                              //Container(),
+                            )),
                       )
                     ],
                   ),
                 ),
               ),
-              Container(
-                color: Colors.grey[200],
-                child: Padding(
-                  padding: const EdgeInsets.all(18.0),
-                  child: Container(
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.add_a_photo_outlined,
-                            color: HexColor("#003580", 1),
-                            size: 20,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "    Click here to add  image.",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
+              ElevatedButton(
+                style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(
+                  Colors.grey[200]!,
+                )),
+                onPressed: () {
+                  uploadImage();
+                },
+                child: Container(
+                  color: Colors.grey[200],
+                  child: Padding(
+                    padding: const EdgeInsets.all(18.0),
+                    child: Container(
+                      height: 60,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.add_a_photo_outlined,
                               color: HexColor("#003580", 1),
+                              size: 20,
                             ),
-                          ),
-                          Spacer(),
-                        ],
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              "    Click here to add  image.",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: HexColor("#003580", 1),
+                              ),
+                            ),
+                            Spacer(),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -219,11 +447,12 @@ class _AddProuctScreenState extends State<AddProuctScreen> {
                   height: 45,
                   child: TextButton(
                     onPressed: () {
-                      Navigator.push(
+                      send();
+                      /*    Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const TabScreen()),
-                      );
+                      );*/
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 10),

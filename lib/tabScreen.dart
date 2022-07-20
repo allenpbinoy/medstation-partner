@@ -7,7 +7,7 @@ import 'orderScreen.dart';
 import 'profileScreen.dart';
 
 class TabScreen extends StatefulWidget {
-  const TabScreen({Key key}) : super(key: key);
+  const TabScreen({Key? key}) : super(key: key);
 
   @override
   _TabScreenState createState() => _TabScreenState();
