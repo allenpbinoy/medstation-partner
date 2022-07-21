@@ -255,3 +255,27 @@ class ApiConstants {
   static String baseUrl = 'https://projectmedico.herokuapp.com/';
   static String usersEndpoint = '/users';
 }
+
+//AppBar9
+class AppBar9 extends StatelessWidget with PreferredSizeWidget {
+  @override
+  final Size preferredSize;
+
+  AppBar9({Key? key})
+      : preferredSize = const Size.fromHeight(56.0),
+        super(key: key);
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+        brightness: Brightness.dark,
+        backgroundColor: HexColor("#003580", 1),
+        elevation: 1,
+        title: Text("Prescription Orders"),
+        leading: Icon(
+          Icons.ac_unit,
+          color: Colors.transparent,
+          size: .1,
+        ),
+        titleSpacing: 60);
+  }
+}

@@ -80,9 +80,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
     print(list);
 
-    setState(() {
-      plist = plist;
-    });
+    if (mounted)
+      setState(() {
+        plist = plist;
+      });
   }
 
   @override
