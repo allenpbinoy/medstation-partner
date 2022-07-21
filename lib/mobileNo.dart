@@ -49,13 +49,6 @@ class _MobileNoState extends State<MobileNo> {
 
     print(response.body);
     var body = response.body;
-
-    if (response.body != null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => TabScreen()),
-      );
-    }
   }
 
   Future<void> send() async {
