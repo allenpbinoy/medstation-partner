@@ -23,7 +23,7 @@ class _OtpScreenState extends State<OtpScreen> {
     print(otp);
     print("cutfufuggigiigiu");
     var map = new Map<String, dynamic>();
-    map['phoneNumber'] = '+919895784449';
+    map['phoneNumber'] = '+919061950370';
     map['code'] = otp;
 
     final response = await http.post(

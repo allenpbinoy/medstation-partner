@@ -67,12 +67,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     print(response.body);
-    var body = response.body;
+    /* var body = response.body;
     var data = jsonDecode(response.body) as List;
-    print(data);
+    print(data);*/
 
     var index = 0;
-    var snumber = data[index].toString();
+    //var snumber = data[index].toString();
 
     var rb = response.body;
     var list = json.decode(rb) as List;

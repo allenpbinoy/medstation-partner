@@ -144,17 +144,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
     map['whatsappNumber'] = wnumber;
     map['sLocation'] = sLocation;
     map['image'] = imageUrl;
-
+    print(number);
+    print(jsonEncode(map));
     // map['password'] = 'password';
     var token = await storage.read(key: "token");
     var token2 =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MmFmNmI4ZjdiMTk5ODhjM2MwZDdkOGIiLCJpYXQiOjE2NTU2NjM1MDMsImV4cCI6MTY4MTU4MzUwM30.XFCZc-w2pZURhLNiozjjEYq0rVuykttxmoZ9TjO32j8";
     final response = await http.post(
       Uri.parse('https://projectmedico.herokuapp.com/vendor/createVendor'),
-      headers: {
-        "Content-Type": "application/json",
-        'Authorization': 'Bearer $token2',
-      },
       encoding: Encoding.getByName("utf-8"),
       body: jsonEncode(map),
     );
