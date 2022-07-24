@@ -14,6 +14,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  bool isLoading = true;
   List<vendorModel> plist = [];
   String shopname = "shopname";
   String phonenumber = "+91123456789";
@@ -23,6 +24,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     check();
+    setState(() {
+      isLoading = false;
+    });
   }
 
   Future<void> check() async {
@@ -73,19 +77,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     print(list);
 
-    setState(() {
-      plist = plist;
-    });
+    if (response.statusCode == 200) {
+      if (mounted)
+        setState(() {
+          isLoading = true;
+        });
+    } else {
+      setState(() {
+        isLoading = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Sorry, Something went wrong'),
+      ));
+    }
+    if (mounted)
+      setState(() {
+        plist = plist;
+      });
 
     var sname = plist[index].shopName;
     print(sname);
     var snumber1 = plist[index].phoneNumber;
     var saddress = plist[index].sAddress;
-    setState(() {
-      shopname = sname!;
-      phonenumber = snumber1!;
-      address = saddress!;
-    });
+    if (mounted)
+      setState(() {
+        shopname = sname!;
+        phonenumber = snumber1!;
+        address = saddress!;
+      });
   }
 
   @override
@@ -137,27 +156,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  shopname,
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16),
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Text(
-                                  phonenumber,
-                                  style: TextStyle(
-                                      color: Colors.amber, fontSize: 14),
-                                ),
-                              ],
-                            ),
+                            child: isLoading
+                                ? Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        shopname,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16),
+                                      ),
+                                      SizedBox(
+                                        height: 5,
+                                      ),
+                                      Text(
+                                        phonenumber,
+                                        style: TextStyle(
+                                            color: Colors.amber, fontSize: 14),
+                                      ),
+                                    ],
+                                  )
+                                : CircularProgressIndicator(
+                                    color: Colors.white,
+                                  ),
                           )
                         ],
                       ),
@@ -175,34 +199,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 15, vertical: 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Your Address",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                    color: Colors.grey[800])),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Text(address,
-                                style: TextStyle(
-                                    fontSize: 12, color: Colors.grey[800])),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                                width: MediaQuery.of(context).size.width,
-                                height: .2,
-                                color: Colors.grey[800]),
-                            Row(
-                              children: [
-                                Spacer(),
-                              ],
-                            )
-                          ],
-                        ),
+                        child: isLoading
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text("Your Address",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                          color: Colors.grey[800])),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(address,
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[800])),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: .2,
+                                      color: Colors.grey[800]),
+                                  Row(
+                                    children: [
+                                      Spacer(),
+                                    ],
+                                  )
+                                ],
+                              )
+                            : Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Container(
+                                    width: MediaQuery.of(context).size.width,
+                                    child: Center(
+                                        child: CircularProgressIndicator(
+                                      color: HexColor("#003580", 1),
+                                    ))),
+                              ),
                       ),
                     ],
                   ),

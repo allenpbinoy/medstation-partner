@@ -20,6 +20,9 @@ class AddProuctScreen extends StatefulWidget {
 }
 
 class _AddProuctScreenState extends State<AddProuctScreen> {
+  bool isImageLoading = true;
+  bool isLoading = true;
+  String imgtxt = "Click here to add image";
   var imageUrl =
       "https://firebasestorage.googleapis.com/v0/b/mullonkalhardwares-a8472.appspot.com/o/placeholder%2Fplaceholder-image.png?alt=media&token=e9738ca3-c35e-4343-bf1a-d80790a56f90";
   bool uploading = false;
@@ -144,7 +147,7 @@ class _AddProuctScreenState extends State<AddProuctScreen> {
     map['whatsappNumber'] = phonenumber;
     map['sLocation'] = location;
     map['imgUrl'] = imageUrl;
-    map['status'] = "enabled";
+    map['status'] = "Available";
 
     // map['password'] = 'password';
     var token = await storage.read(key: "token");
@@ -165,11 +168,24 @@ class _AddProuctScreenState extends State<AddProuctScreen> {
 
     var body = response.body;
 
-    if (body != null) {
-      Navigator.push(
+    if (response.statusCode == 201) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Product added Successfully'),
+      ));
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => TabScreen()),
       );
+      setState(() {
+        isLoading = true;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Sorry, Something went wrong.'),
+      ));
+      setState(() {
+        isLoading = true;
+      });
     }
   }
 
@@ -207,6 +223,8 @@ class _AddProuctScreenState extends State<AddProuctScreen> {
         print(imageUrl);
         print(uploading);
         print(imageid);
+        isImageLoading = true;
+        imgtxt = "Image Uploaded";
       });
     } else {
       print("permission denied");
@@ -395,78 +413,97 @@ class _AddProuctScreenState extends State<AddProuctScreen> {
                   ),
                 ),
               ),
-              ElevatedButton(
-                style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(
-                  Colors.grey[200]!,
-                )),
-                onPressed: () {
-                  uploadImage();
-                },
-                child: Container(
-                  color: Colors.grey[200],
-                  child: Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Container(
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.add_a_photo_outlined,
-                              color: HexColor("#003580", 1),
-                              size: 20,
+              isImageLoading
+                  ? ElevatedButton(
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                        Colors.grey[200]!,
+                      )),
+                      onPressed: () {
+                        uploadImage();
+                        setState(() {
+                          isImageLoading = false;
+                        });
+                      },
+                      child: Container(
+                        color: Colors.grey[200],
+                        child: Padding(
+                          padding: const EdgeInsets.all(18.0),
+                          child: Container(
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
                             ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text(
-                              "    Click here to add  image.",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                color: HexColor("#003580", 1),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.add_a_photo_outlined,
+                                    color: HexColor("#003580", 1),
+                                    size: 20,
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    imgtxt,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: HexColor("#003580", 1),
+                                    ),
+                                  ),
+                                  Spacer(),
+                                ],
                               ),
                             ),
-                            Spacer(),
-                          ],
+                          ),
+                        ),
+                      ),
+                    )
+                  : Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: CircularProgressIndicator(
+                          color: HexColor("#003580", 1),
                         ),
                       ),
                     ),
-                  ),
-                ),
-              ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 45,
-                  child: TextButton(
-                    onPressed: () {
-                      send();
-                      /*    Navigator.push(
+                child: isLoading
+                    ? Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 45,
+                        child: TextButton(
+                          onPressed: () {
+                            setState(() {
+                              isLoading = false;
+                            });
+                            send();
+                            /*    Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => const TabScreen()),
                       );*/
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        "Save",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                      HexColor("#003580", 1),
-                    )),
-                  ),
-                ),
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            child: Text(
+                              "Save",
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                          style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                            HexColor("#003580", 1),
+                          )),
+                        ),
+                      )
+                    : Center(
+                        child: CircularProgressIndicator(
+                            color: HexColor("#003580", 1))),
               )
             ],
           ),

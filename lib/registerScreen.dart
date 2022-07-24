@@ -14,7 +14,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:uuid/uuid.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path/path.dart';
+import 'package:path/path.dart' as path;
 import 'package:firebase_storage/firebase_storage.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -25,6 +25,20 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  bool isImageLoading = true;
+  bool isLoading = true;
+  bool isLocLoading = true;
+
+  String loc = "Click here to add store location";
+  String img = "Click here to add store image.";
+
+  @override
+  void initState() {
+    super.initState();
+    //check();
+    //print(isLoading);
+  }
+
 //Gets Location
   String location = 'Null, Press Button';
   String Address = 'search';
@@ -75,12 +89,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
         print(imageUrl);
         print(uploading);
         print(imageid);
+        isImageLoading = true;
+        img = "Image uploaded";
       });
     } else {
       print("permission denied");
     }
   }
 
+  loccheck() {}
   Future<Position> _getGeoLocationPosition() async {
     bool serviceEnabled;
     LocationPermission permission;
@@ -122,8 +139,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
     print(placemarks);
     Placemark place = placemarks[0];
     Address =
-        '${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
-    setState(() {});
+        '${place.thoroughfare}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}';
+    setState(() {
+      // loc = place.Thoroughfare! + " " + place.locality!;
+      print(Address);
+      isLocLoading = true;
+      loc = "Location data collected";
+    });
   }
 
   Future<void> send() async {
@@ -136,6 +158,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     // print(number);
     var number = await storage.read(key: 'username');
     print("cutfufuggigiigiu");
+    print(number);
     var map = new Map<String, dynamic>();
     map['username'] = number;
     map['shopName'] = shopname;
@@ -145,18 +168,37 @@ class _RegisterScreenState extends State<RegisterScreen> {
     map['sLocation'] = sLocation;
     map['image'] = imageUrl;
     print(number);
-    print(jsonEncode(map));
+    print(map);
     // map['password'] = 'password';
     var token = await storage.read(key: "token");
     var token2 =
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2MmFmNmI4ZjdiMTk5ODhjM2MwZDdkOGIiLCJpYXQiOjE2NTU2NjM1MDMsImV4cCI6MTY4MTU4MzUwM30.XFCZc-w2pZURhLNiozjjEYq0rVuykttxmoZ9TjO32j8";
     final response = await http.post(
       Uri.parse('https://projectmedico.herokuapp.com/vendor/createVendor'),
-      encoding: Encoding.getByName("utf-8"),
-      body: jsonEncode(map),
+      body: map,
     );
 
     print(response.body);
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Account successfully created'),
+      ));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => TabScreen()),
+      );
+      setState(() {
+        isLoading = true;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Something went wrong. Please try again'),
+      ));
+      setState(() {
+        isLoading = true;
+      });
+    }
   }
 
   @override
@@ -208,39 +250,51 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       backgroundColor: MaterialStateProperty.all(Colors.white),
                     ),
                     onPressed: () {
+                      setState(() {
+                        isImageLoading = false;
+                      });
                       uploadImage();
                     },
-                    child: Container(
-                      height: 60,
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          border: Border.all(width: .1),
-                          borderRadius: BorderRadius.circular(3)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.add_a_photo_outlined,
-                              color: HexColor("#003580", 1),
-                              size: 20,
+                    child: isImageLoading
+                        ? Container(
+                            height: 60,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(width: .1),
+                                borderRadius: BorderRadius.circular(3)),
+                            child: Padding(
+                              padding: const EdgeInsets.all(12.0),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.add_a_photo_outlined,
+                                    color: HexColor("#003580", 1),
+                                    size: 20,
+                                  ),
+                                  SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    "    " + img,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14,
+                                      color: HexColor("#003580", 1),
+                                    ),
+                                  ),
+                                  Spacer(),
+                                ],
+                              ),
                             ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Text(
-                              "    Click here to add store image.",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
+                          )
+                        : Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Center(
+                              child: CircularProgressIndicator(
                                 color: HexColor("#003580", 1),
                               ),
                             ),
-                            Spacer(),
-                          ],
-                        ),
-                      ),
-                    ),
+                          ),
                   ),
                   SizedBox(
                     height: 15,
@@ -368,88 +422,98 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     color: Colors.white),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: 0, bottom: 20, right: 20, left: 20),
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 60,
-                child: TextButton(
-                  onPressed: () async {
-                    Position position = await _getGeoLocationPosition();
-                    location =
-                        'Lat: ${position.latitude} , Long: ${position.longitude}';
-                    GetAddressFromLatLong(position);
-                    print(location);
-                    await storage.write(key: 'location', value: location);
-                  },
-                  child: Container(
-                    height: 50,
-                    decoration: BoxDecoration(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12.0),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.location_searching,
-                            color: HexColor("#003580", 1),
-                            size: 20,
-                          ),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            "   Click here to add store location",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: HexColor("#003580", 1),
+            isLocLoading
+                ? Padding(
+                    padding: const EdgeInsets.only(
+                        top: 0, bottom: 20, right: 20, left: 20),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 60,
+                      child: TextButton(
+                        onPressed: () async {
+                          setState(() {
+                            isLocLoading = false;
+                          });
+                          Position position = await _getGeoLocationPosition();
+                          location =
+                              'Lat: ${position.latitude} , Long: ${position.longitude}';
+                          GetAddressFromLatLong(position);
+                          print(location);
+
+                          await storage.write(key: 'location', value: location);
+                        },
+                        child: Container(
+                          height: 50,
+                          decoration: BoxDecoration(),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12.0),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.location_searching,
+                                  color: HexColor("#003580", 1),
+                                  size: 20,
+                                ),
+                                SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  loc,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: HexColor("#003580", 1),
+                                  ),
+                                ),
+                                Spacer(),
+                              ],
                             ),
                           ),
-                          Spacer(),
-                        ],
+                        ),
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.white,
+                        )),
                       ),
                     ),
+                  )
+                : Center(
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
                   ),
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                    Colors.white,
-                  )),
-                ),
-              ),
-            ),
             SizedBox(
               height: MediaQuery.of(context).size.height / 16,
             ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: 45,
-                child: TextButton(
-                  onPressed: () {
-                    send();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const TabScreen()),
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      "Save",
-                      style: TextStyle(
-                        color: HexColor("#003580", 1),
+            isLoading
+                ? Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: 45,
+                      child: TextButton(
+                        onPressed: () {
+                          send();
+                          setState(() {
+                            isLoading = false;
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Text(
+                            "Save",
+                            style: TextStyle(
+                              color: HexColor("#003580", 1),
+                            ),
+                          ),
+                        ),
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all<Color>(
+                          Colors.white,
+                        )),
                       ),
                     ),
-                  ),
-                  style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                    Colors.white,
-                  )),
-                ),
-              ),
-            )
+                  )
+                : Center(child: CircularProgressIndicator(color: Colors.white))
           ],
         ),
       ),

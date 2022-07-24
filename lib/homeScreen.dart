@@ -19,12 +19,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool isLoading = true;
   List<productDetails> plist = [];
 
   @override
   void initState() {
     super.initState();
     check();
+    setState(() {
+      isLoading = false;
+    });
   }
 
   getPdata() async {
@@ -80,6 +84,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
     print(list);
 
+    if (response.statusCode == 200) {
+      if (mounted)
+        setState(() {
+          isLoading = true;
+        });
+    } else {
+      setState(() {
+        isLoading = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Sorry, Something went wrong'),
+      ));
+    }
     if (mounted)
       setState(() {
         plist = plist;
@@ -89,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       appBar: AppBar7(),
       body: SafeArea(
           child: SingleChildScrollView(
@@ -143,25 +161,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 15),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Make your Bussiness a step ahead with ",
-                            style: TextStyle(
-                                color: Colors.grey[800], fontSize: 14),
-                          ),
-                          Text(
-                            "MedStation Partner App! ",
-                            style: TextStyle(
-                                color: Colors.grey[800],
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ],
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      color: Colors.white,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Make your Bussiness a step ahead with ",
+                              style: TextStyle(
+                                  color: Colors.grey[800], fontSize: 14),
+                            ),
+                            Text(
+                              "MedStation Partner App! ",
+                              style: TextStyle(
+                                  color: Colors.grey[800],
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     Container(
@@ -169,21 +191,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       color: Colors.grey[200],
                     ),
                     Container(
+                      width: MediaQuery.of(context).size.width,
+                      color: Colors.white,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              "New Medicals, Kothamangalam ",
-                              style: TextStyle(
-                                  color: Colors.grey[800],
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                          ),
                           SizedBox(
-                            height: 10,
+                            height: 20,
                           ),
                           Padding(
                             padding: const EdgeInsets.only(right: 10, left: 10),
@@ -232,7 +246,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                           SizedBox(
-                            height: 30,
+                            height: 15,
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -251,112 +265,139 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: 8,
                             color: Colors.grey[200],
                           ),
-                          Container(
-                              child: ListView.builder(
-                            physics: NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: plist.length,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                child: Container(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: new GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  ProductScreen()),
-                                        );
-                                      },
-                                      child: Container(
+                          isLoading
+                              ? Container(
+                                  color: Colors.grey[200],
+                                  child: ListView.builder(
+                                    physics: NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemCount: plist.length,
+                                    itemBuilder: (context, index) {
+                                      return GestureDetector(
                                         child: Column(
                                           children: [
-                                            Row(
-                                              children: [
-                                                Container(
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width /
-                                                            3,
-                                                    child: Image.network(
-                                                        plist[index].imgUrl!)),
-                                                SizedBox(
-                                                  width: 10,
-                                                ),
-                                                Container(
+                                            Container(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: Container(
                                                   child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
                                                     children: [
-                                                      Text(
-                                                        plist[index]
-                                                            .productname!,
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 18),
-                                                      ),
-                                                      Text(
-                                                        plist[index].qty!,
-                                                        style: TextStyle(
-                                                            color: Colors.grey,
-                                                            fontSize: 12),
+                                                      Container(
+                                                        color: Colors.white,
+                                                        child: Column(
+                                                          children: [
+                                                            Row(
+                                                              children: [
+                                                                Container(
+                                                                    width: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width /
+                                                                        3,
+                                                                    child: Image.network(
+                                                                        plist[index]
+                                                                            .imgUrl!)),
+                                                                SizedBox(
+                                                                  width: 10,
+                                                                ),
+                                                                Container(
+                                                                  child: Column(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .spaceBetween,
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Text(
+                                                                        plist[index]
+                                                                            .productname!,
+                                                                        style: TextStyle(
+                                                                            fontWeight:
+                                                                                FontWeight.bold,
+                                                                            fontSize: 18),
+                                                                      ),
+                                                                      Text(
+                                                                        plist[index]
+                                                                            .qty!,
+                                                                        style: TextStyle(
+                                                                            color:
+                                                                                Colors.grey,
+                                                                            fontSize: 12),
+                                                                      ),
+                                                                      SizedBox(
+                                                                        height:
+                                                                            5,
+                                                                      ),
+                                                                      Text(
+                                                                        plist[index]
+                                                                            .price!,
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight
+                                                                                .bold,
+                                                                            fontSize:
+                                                                                18,
+                                                                            color:
+                                                                                Colors.grey[800]),
+                                                                      ),
+                                                                      SizedBox(
+                                                                        height:
+                                                                            5,
+                                                                      ),
+                                                                      SizedBox(
+                                                                        height:
+                                                                            5,
+                                                                      ),
+                                                                      Text(
+                                                                        plist[index]
+                                                                            .status!,
+                                                                        style: TextStyle(
+                                                                            fontWeight: FontWeight
+                                                                                .bold,
+                                                                            fontSize:
+                                                                                18,
+                                                                            color:
+                                                                                Colors.green),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                )
+                                                              ],
+                                                            ),
+                                                            SizedBox(
+                                                              height: 5,
+                                                            )
+                                                          ],
+                                                        ),
                                                       ),
                                                       SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      Text(
-                                                        plist[index].price!,
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 18,
-                                                            color: Colors
-                                                                .grey[800]),
-                                                      ),
-                                                      SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      SizedBox(
-                                                        height: 5,
-                                                      ),
-                                                      Text(
-                                                        plist[index].status!,
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 18,
-                                                            color:
-                                                                Colors.green),
+                                                        height: 0,
                                                       ),
                                                     ],
                                                   ),
-                                                )
-                                              ],
-                                            ),
-                                            SizedBox(
-                                              height: 5,
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         ),
+                                      );
+                                    },
+                                  ))
+                              : Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    color: Colors.transparent,
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        color: HexColor("#003580", 1),
                                       ),
                                     ),
                                   ),
                                 ),
-                              );
-                            },
-                          )),
-                          Container(
+                          /*  Container(
                             height: 8,
                             color: Colors.grey[200],
-                          )
+                          )*/
                         ],
                       ),
                     )
